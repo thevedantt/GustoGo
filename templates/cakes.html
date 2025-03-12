@@ -1,0 +1,804 @@
+{% extends "base.html" %}
+
+{% block title %}Our Cakes - GustoGo{% endblock %}
+
+{% block content %}
+<div class="cakes-container">
+    <div class="cakes-header">
+        <h1>Our Delicious Cakes</h1>
+        <p>Choose from our selection of freshly baked cakes</p>
+    </div>
+
+    <section class="cakes-section">
+        <h2>Single Flavors</h2>
+        <div class="cakes-grid">
+            {% for flavor in single_flavors %}
+            <div class="cake-item">
+                <div class="cake-item-image">
+                    <img src="{{ url_for('static', filename='images/cakes/' + flavor.name.lower().replace(' ', '_') + '.jpg') }}" 
+                         alt="{{ flavor.name }}"
+                         class="cake-image">
+                    <div class="cake-badge">₹{{ flavor.price_per_kg }}/kg</div>
+                </div>
+                <div class="cake-item-info">
+                    <h3>{{ flavor.name }}</h3>
+                    <p class="description">{{ flavor.description }}</p>
+                    <form class="add-to-cart-form" action="{{ url_for('add_to_cart') }}" method="POST">
+                        <input type="hidden" name="item_type" value="cake">
+                        <input type="hidden" name="item_id" value="{{ flavor.id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <div class="size-select">
+                            <label for="size_{{ flavor.id }}">Size:</label>
+                            <select name="size_kg" id="size_{{ flavor.id }}" required>
+                                <option value="0.5">0.5 kg</option>
+                                <option value="1">1 kg</option>
+                                <option value="1.5">1.5 kg</option>
+                                <option value="2">2 kg</option>
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="customize-btn" data-flavor-id="{{ flavor.id }}">
+                                <span class="material-symbols-rounded">palette</span>
+                                Customize
+                            </button>
+                            <button type="submit" class="add-to-cart-btn">
+                                <span class="material-symbols-rounded">shopping_cart</span>
+                                Add to Cart
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="cakes-section">
+        <h2>Combination Flavors</h2>
+        <div class="cakes-grid">
+            {% for flavor in combination_flavors %}
+            <div class="cake-item">
+                <div class="cake-item-image">
+                    <img src="{{ url_for('static', filename='images/cakes/' + flavor.name.lower().replace(' ', '_') + '.jpg') }}" 
+                         alt="{{ flavor.name }}"
+                         class="cake-image">
+                    <div class="cake-badge">₹{{ flavor.price_per_kg }}/kg</div>
+                </div>
+                <div class="cake-item-info">
+                    <h3>{{ flavor.name }}</h3>
+                    <p class="description">{{ flavor.description }}</p>
+                    <form class="add-to-cart-form" action="{{ url_for('add_to_cart') }}" method="POST">
+                        <input type="hidden" name="item_type" value="cake">
+                        <input type="hidden" name="item_id" value="{{ flavor.id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <div class="size-select">
+                            <label for="size_{{ flavor.id }}">Size:</label>
+                            <select name="size_kg" id="size_{{ flavor.id }}" required>
+                                <option value="0.5">0.5 kg</option>
+                                <option value="1">1 kg</option>
+                                <option value="1.5">1.5 kg</option>
+                                <option value="2">2 kg</option>
+                            </select>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="customize-btn" data-flavor-id="{{ flavor.id }}">
+                                <span class="material-symbols-rounded">palette</span>
+                                Customize
+                            </button>
+                            <button type="submit" class="add-to-cart-btn">
+                                <span class="material-symbols-rounded">shopping_cart</span>
+                                Add to Cart
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<!-- Cake Customization Modal -->
+<div id="customizeModal" class="customize-modal">
+    <div class="customize-modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Customize Your Cake</h2>
+        
+        <form id="customizeCakeForm" class="customize-form" action="{{ url_for('add_to_cart') }}" method="POST">
+            <input type="hidden" name="item_type" value="cake">
+            <input type="hidden" name="item_id" id="custom_item_id">
+            <input type="hidden" name="quantity" value="1">
+            <input type="hidden" name="is_customized" value="true">
+            
+            <div class="customize-section">
+                <h3>Base Cake</h3>
+                <div class="form-group">
+                    <label for="cake_flavor">Select Flavor:</label>
+                    <select name="flavor_id" id="cake_flavor" required>
+                        <option value="">Choose a flavor</option>
+                        {% for flavor in single_flavors %}
+                        <option value="{{ flavor.id }}" data-price="{{ flavor.price_per_kg }}">{{ flavor.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="cake_size">Select Size:</label>
+                    <select name="size_kg" id="cake_size" required>
+                        <option value="0.5">0.5 kg</option>
+                        <option value="1">1 kg</option>
+                        <option value="1.5">1.5 kg</option>
+                        <option value="2">2 kg</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="customize-section">
+                <h3>Icing</h3>
+                <div class="form-group">
+                    <label for="icing_type">Select Icing:</label>
+                    <select name="icing_type" id="icing_type" required>
+                        <option value="buttercream">Buttercream</option>
+                        <option value="fondant">Fondant</option>
+                        <option value="whipped_cream">Whipped Cream</option>
+                        <option value="ganache">Chocolate Ganache</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="icing_color">Icing Color:</label>
+                    <input type="color" name="icing_color" id="icing_color" value="#FFFFFF">
+                </div>
+            </div>
+
+            <div class="customize-section">
+                <h3>Toppings</h3>
+                <div class="toppings-grid">
+                    <div class="topping-item">
+                        <input type="checkbox" name="toppings" id="sprinkles" value="sprinkles">
+                        <label for="sprinkles">Sprinkles</label>
+                    </div>
+                    <div class="topping-item">
+                        <input type="checkbox" name="toppings" id="fruits" value="fruits">
+                        <label for="fruits">Fresh Fruits</label>
+                    </div>
+                    <div class="topping-item">
+                        <input type="checkbox" name="toppings" id="nuts" value="nuts">
+                        <label for="nuts">Nuts</label>
+                    </div>
+                    <div class="topping-item">
+                        <input type="checkbox" name="toppings" id="chocolate" value="chocolate">
+                        <label for="chocolate">Chocolate Shavings</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="customize-section">
+                <h3>Special Instructions</h3>
+                <div class="form-group">
+                    <textarea name="special_instructions" id="special_instructions" rows="3" 
+                              placeholder="Any special requests or message to be written on the cake?"></textarea>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3>Preview</h3>
+                <div class="cake-preview">
+                    <div class="cake-preview-image">
+                        <div class="cake-layer" id="cakeBase"></div>
+                        <div class="cake-layer" id="cakeIcing"></div>
+                        <div class="cake-layer" id="cakeToppings"></div>
+                    </div>
+                    <div class="price-preview">
+                        <span>Estimated Price:</span>
+                        <span id="totalPrice">₹0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="add-to-cart-btn">
+                    <span class="material-symbols-rounded">shopping_cart</span>
+                    Add to Cart
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cakes-container {
+        padding: 2rem 0;
+        background: #f8f9fa;
+    }
+
+    .cakes-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .cakes-header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .cakes-section {
+        margin-bottom: 3rem;
+    }
+
+    .cakes-section h2 {
+        margin-bottom: 1.5rem;
+        color: #333;
+        font-size: 2rem;
+        text-align: center;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .cakes-section h2:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: #e44d26;
+        border-radius: 2px;
+    }
+
+    .cakes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 0 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .cake-item {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .cake-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .cake-item-image {
+        position: relative;
+        width: 100%;
+        height: 250px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .cake-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .cake-item:hover .cake-item-image img {
+        transform: scale(1.1);
+    }
+
+    .cake-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(228, 77, 38, 0.9);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .cake-item-info {
+        padding: 1.5rem;
+        background: white;
+        border-radius: 15px;
+        margin-top: -2rem;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    }
+
+    .cake-item-info h3 {
+        margin: 0 0 0.5rem;
+        color: #333;
+        font-size: 1.25rem;
+    }
+
+    .description {
+        color: #666;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .size-select {
+        margin-bottom: 1rem;
+    }
+
+    .size-select label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .size-select select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #f8f9fa;
+        color: #333;
+        font-size: 0.9rem;
+        transition: border-color 0.3s;
+    }
+
+    .size-select select:focus {
+        outline: none;
+        border-color: #e44d26;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .customize-btn, .add-to-cart-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .customize-btn {
+        background: #fff3f0;
+        color: #e44d26;
+        border: 1px solid #e44d26;
+    }
+
+    .add-to-cart-btn {
+        background: #e44d26;
+        color: white;
+    }
+
+    .customize-btn:hover {
+        background: #e44d26;
+        color: white;
+    }
+
+    .add-to-cart-btn:hover {
+        background: #d13b1e;
+    }
+
+    /* Modal Styles */
+    .customize-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .customize-modal-content {
+        background: white;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 15px;
+        max-width: 800px;
+        position: relative;
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        color: #666;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .close-modal:hover {
+        color: #e44d26;
+    }
+
+    .customize-form {
+        margin-top: 2rem;
+    }
+
+    .customize-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .customize-section h3 {
+        margin: 0 0 1rem;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    .form-group select,
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: white;
+        color: #333;
+        font-size: 0.9rem;
+        transition: border-color 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #e44d26;
+    }
+
+    .toppings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .topping-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .preview-section {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .cake-preview {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1rem;
+    }
+
+    .cake-preview-image {
+        width: 200px;
+        height: 200px;
+        position: relative;
+    }
+
+    .cake-layer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+
+    #cakeBase {
+        background: #f8d7da;
+        z-index: 1;
+    }
+
+    #cakeIcing {
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 2;
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+    }
+
+    #cakeToppings {
+        z-index: 3;
+    }
+
+    .price-preview {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #e44d26;
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .form-actions .add-to-cart-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    @media (max-width: 768px) {
+        .customize-modal-content {
+            margin: 1rem;
+            padding: 1rem;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .toppings-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Store the placeholder URL
+    const placeholderUrl = "{{ url_for('static', filename='images/cake-placeholder.jpg') }}";
+    
+    // Handle image loading errors
+    document.querySelectorAll('.cake-image').forEach(img => {
+        img.addEventListener('error', function() {
+            this.src = placeholderUrl;
+        });
+    });
+
+    // Handle form submission
+    const forms = document.querySelectorAll('.add-to-cart-form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            const btn = this.querySelector('.add-to-cart-btn');
+            const icon = btn.querySelector('.material-symbols-rounded');
+            
+            // Add loading state
+            btn.classList.add('loading');
+            icon.textContent = 'sync';
+            btn.disabled = true;
+            
+            // Create form data
+            const formData = new FormData(this);
+            
+            // Submit form using fetch
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json().catch(() => {
+                        // If response is not JSON, just return success
+                        return { success: true };
+                    });
+                } else {
+                    throw new Error('Failed to add to cart');
+                }
+            })
+            .then(data => {
+                window.location.href = "{{ url_for('view_cart') }}";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add item to cart. Please try again.');
+                btn.classList.remove('loading');
+                icon.textContent = 'shopping_cart';
+                btn.disabled = false;
+            });
+        });
+    });
+
+    // Customization Modal
+    const modal = document.getElementById('customizeModal');
+    const customizeBtns = document.querySelectorAll('.customize-btn');
+    const closeModal = document.querySelector('.close-modal');
+    const customizeForm = document.getElementById('customizeCakeForm');
+    
+    // Base price per kg for calculations
+    const basePrice = 800;
+    let currentPrice = 0;
+
+    function updatePreview() {
+        const flavor = document.getElementById('cake_flavor');
+        const size = document.getElementById('cake_size');
+        const icingType = document.getElementById('icing_type');
+        const icingColor = document.getElementById('icing_color');
+        const toppings = document.querySelectorAll('input[name="toppings"]:checked');
+        
+        // Update cake base
+        const cakeBase = document.getElementById('cakeBase');
+        cakeBase.style.transform = `scale(${size.value})`;
+        
+        // Update icing
+        const cakeIcing = document.getElementById('cakeIcing');
+        cakeIcing.style.backgroundColor = icingColor.value;
+        cakeIcing.style.transform = `scale(${size.value})`;
+        
+        // Calculate price
+        let price = basePrice;
+        if (flavor.selectedOptions[0]) {
+            price = parseFloat(flavor.selectedOptions[0].dataset.price) || basePrice;
+        }
+        price *= parseFloat(size.value);
+        
+        // Add icing price
+        if (icingType.value === 'fondant') price += 200;
+        if (icingType.value === 'ganache') price += 150;
+        
+        // Add toppings price
+        price += (toppings.length * 100);
+        
+        // Update price display
+        document.getElementById('totalPrice').textContent = `₹${price.toFixed(2)}`;
+        currentPrice = price;
+    }
+
+    // Event listeners for customization form
+    document.getElementById('cake_flavor').addEventListener('change', updatePreview);
+    document.getElementById('cake_size').addEventListener('change', updatePreview);
+    document.getElementById('icing_type').addEventListener('change', updatePreview);
+    document.getElementById('icing_color').addEventListener('input', updatePreview);
+    document.querySelectorAll('input[name="toppings"]').forEach(topping => {
+        topping.addEventListener('change', updatePreview);
+    });
+
+    // Check for customize parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const customizeParam = urlParams.get('customize');
+    if (customizeParam) {
+        const flavorSelect = document.getElementById('cake_flavor');
+        const customItemId = document.getElementById('custom_item_id');
+        flavorSelect.value = customizeParam;
+        customItemId.value = customizeParam;
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        updatePreview();
+    }
+
+    // Open modal
+    customizeBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const flavorId = this.dataset.flavorId;
+            if (flavorId) {
+                const flavorSelect = document.getElementById('cake_flavor');
+                const customItemId = document.getElementById('custom_item_id');
+                flavorSelect.value = flavorId;
+                customItemId.value = flavorId;
+            }
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            updatePreview();
+        });
+    });
+
+    // Close modal
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        // Clear editing state
+        sessionStorage.removeItem('editing_cart_item_id');
+    });
+
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            // Clear editing state
+            sessionStorage.removeItem('editing_cart_item_id');
+        }
+    });
+
+    // Handle form submission
+    customizeForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        
+        // Validate required fields
+        const flavor = document.getElementById('cake_flavor').value;
+        const size = document.getElementById('cake_size').value;
+        const icingType = document.getElementById('icing_type').value;
+        
+        if (!flavor || !size || !icingType) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Add loading state
+        const btn = this.querySelector('.add-to-cart-btn');
+        const icon = btn.querySelector('.material-symbols-rounded');
+        btn.classList.add('loading');
+        icon.textContent = 'sync';
+        btn.disabled = true;
+
+        // Create form data
+        const formData = new FormData(this);
+        
+        // Add customization details
+        const customizationDetails = {
+            icing_type: icingType,
+            icing_color: document.getElementById('icing_color').value,
+            toppings: Array.from(document.querySelectorAll('input[name="toppings"]:checked')).map(cb => cb.value),
+            special_instructions: document.getElementById('special_instructions').value,
+            custom_price: currentPrice
+        };
+        
+        formData.append('customization_details', JSON.stringify(customizationDetails));
+
+        // Check if we're editing an existing cart item
+        const editingCartItemId = sessionStorage.getItem('editing_cart_item_id');
+        const submitUrl = editingCartItemId 
+            ? `/update-cart-item/${editingCartItemId}/customize`
+            : this.action;
+
+        // Submit form using fetch
+        fetch(submitUrl, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json().catch(() => {
+                    // If response is not JSON, just return success
+                    return { success: true };
+                });
+            } else {
+                throw new Error('Failed to add to cart');
+            }
+        })
+        .then(data => {
+            // Clear editing state
+            sessionStorage.removeItem('editing_cart_item_id');
+            // Always redirect to cart page after adding item
+            window.location.href = "{{ url_for('view_cart') }}";
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to add item to cart. Please try again.');
+            btn.classList.remove('loading');
+            icon.textContent = 'shopping_cart';
+            btn.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Customize Your Cake - GustoGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cake-order-section {
+        padding: 60px 0;
+        background: #f8f9fa;
+    }
+
+    .cake-order-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .cake-order-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .cake-order-header h1 {
+        color: #1a1a1a;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .cake-order-header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .cake-order-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .cake-preview {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+
+    .cake-preview h2 {
+        color: #1a1a1a;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+    }
+
+    .preview-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .preview-details {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .preview-detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: #666;
+    }
+
+    .preview-detail-row:last-child {
+        margin-bottom: 0;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .cake-form {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #1a1a1a;
+        outline: none;
+    }
+
+    .size-options {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .size-option {
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .size-option:hover {
+        border-color: #1a1a1a;
+    }
+
+    .size-option.active {
+        border-color: #1a1a1a;
+        background: #f8f9fa;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #1a1a1a;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #333;
+    }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        border: 1px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+
+    @media (max-width: 768px) {
+        .cake-order-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="cake-order-section">
+    <div class="cake-order-container">
+        <div class="cake-order-header">
+            <h1>Customize Your Cake</h1>
+            <p>Add the perfect finishing touches to your cake</p>
+        </div>
+
+        <div class="cake-order-grid">
+            <!-- Cake Preview -->
+            <div class="cake-preview">
+                <h2>Your Cake Preview</h2>
+                <img src="{{ flavor.image_url or url_for('static', filename='images/cake-placeholder.jpg') }}" 
+                     alt="{{ flavor.name }}" 
+                     class="preview-image">
+                <div class="preview-details">
+                    <div class="preview-detail-row">
+                        <span>Flavor:</span>
+                        <span>{{ flavor.name }}</span>
+                    </div>
+                    <div class="preview-detail-row">
+                        <span>Price per kg:</span>
+                        <span>₹{{ "%.2f"|format(flavor.price_per_kg) }}</span>
+                    </div>
+                    <div class="preview-detail-row">
+                        <span>Size:</span>
+                        <span id="previewSize">Select size</span>
+                    </div>
+                    <div class="preview-detail-row">
+                        <span>Message:</span>
+                        <span id="previewMessage">Add your message</span>
+                    </div>
+                    <div class="preview-detail-row">
+                        <span>Total Price:</span>
+                        <span id="previewTotal">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Form -->
+            <form class="cake-form" id="cakeOrderForm" method="POST" action="{{ url_for('add_cake_to_cart') }}">
+                <input type="hidden" name="flavor_id" value="{{ flavor.id }}">
+                
+                <div class="form-group">
+                    <label>Select Cake Size (kg)</label>
+                    <div class="size-options">
+                        <div class="size-option" data-size="1">1 kg</div>
+                        <div class="size-option" data-size="1.5">1.5 kg</div>
+                        <div class="size-option" data-size="2">2 kg</div>
+                        <div class="size-option" data-size="3">3 kg</div>
+                    </div>
+                    <input type="hidden" id="size" name="size" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Cake Message</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="message" 
+                           name="message" 
+                           placeholder="Happy Birthday!" 
+                           maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="quantity" 
+                           name="quantity" 
+                           value="1" 
+                           min="1" 
+                           max="10" 
+                           required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-symbols-rounded">add_shopping_cart</span>
+                        Add to Cart
+                    </button>
+                    <button type="button" onclick="submitForCheckout()" class="btn btn-secondary">
+                        <span class="material-symbols-rounded">shopping_bag</span>
+                        Order Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('cakeOrderForm');
+    const sizeOptions = document.querySelectorAll('.size-option');
+    const sizeInput = document.getElementById('size');
+    const messageInput = document.getElementById('message');
+    const quantityInput = document.getElementById('quantity');
+    const previewSize = document.getElementById('previewSize');
+    const previewMessage = document.getElementById('previewMessage');
+    const previewTotal = document.getElementById('previewTotal');
+    
+    const pricePerKg = {{ flavor.price_per_kg }};
+
+    function updatePreview() {
+        const size = parseFloat(sizeInput.value) || 0;
+        const message = messageInput.value;
+        const quantity = parseInt(quantityInput.value) || 1;
+
+        previewSize.textContent = size ? `${size} kg` : 'Select size';
+        previewMessage.textContent = message || 'Add your message';
+        previewTotal.textContent = `₹${(pricePerKg * size * quantity).toFixed(2)}`;
+    }
+
+    // Event listeners
+    messageInput.addEventListener('input', updatePreview);
+    quantityInput.addEventListener('change', updatePreview);
+
+    sizeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            sizeOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+            sizeInput.value = this.dataset.size;
+            updatePreview();
+        });
+    });
+
+    // Set default size
+    const defaultSize = sizeOptions[0];
+    defaultSize.classList.add('active');
+    sizeInput.value = defaultSize.dataset.size;
+    updatePreview();
+});
+
+function submitForCheckout() {
+    const form = document.getElementById('cakeOrderForm');
+    form.action = "{{ url_for('submit_cake_order') }}";
+    form.submit();
+}
+</script>
+{% endblock %} 

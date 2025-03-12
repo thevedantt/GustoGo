@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}GustoGo - Delicious Food Delivered{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Delicious Food <span>Delivered</span> To Your Door</h1>
+                <p>Experience the finest cuisine from local restaurants, delivered hot and fresh to your doorstep.</p>
+                <div class="hero-actions">
+                    <a href="#" class="primary-btn">Order Now</a>
+                    <a href="{{ url_for('menu') }}" class="secondary-btn">View Menu</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/hero-food.png') }}" alt="Delicious meal" />
+                <!-- We'll need to add this image later -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose <span>GustoGo</span>?</h2>
+                <p>We're committed to providing the best food delivery experience</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="material-symbols-rounded">local_shipping</span>
+                    <h3>Fast Delivery</h3>
+                    <p>Hot food delivered to your doorstep in 30 minutes or less.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="material-symbols-rounded">restaurant_menu</span>
+                    <h3>Quality Food</h3>
+                    <p>Partner with the best local restaurants for authentic taste.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="material-symbols-rounded">payments</span>
+                    <h3>Easy Payment</h3>
+                    <p>Multiple payment options for your convenience.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="material-symbols-rounded">support_agent</span>
+                    <h3>24/7 Support</h3>
+                    <p>Our customer service team is always ready to help.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Special Party & Cakes Section -->
+    <section class="party-cakes" style="background: linear-gradient(135deg, #ff6b6b, #e44d26); color: white; padding: 80px 0; margin: 40px 0;">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+                <h2 style="color: white;">Special <span style="color: #ffd700;">Celebrations</span></h2>
+                <p style="color: rgba(255, 255, 255, 0.9);">Make your events extraordinary with our custom cakes and party packages</p>
+            </div>
+            <div class="celebration-options" style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;">
+                <div class="celebration-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; flex: 1; min-width: 300px; max-width: 400px; text-align: center; transition: transform 0.3s;">
+                    <div class="card-icon" style="margin-bottom: 20px;">
+                        <span class="material-symbols-rounded" style="font-size: 48px;">cake</span>
+                    </div>
+                    <h3 style="margin-bottom: 15px; color: #ffd700;">Custom Celebration Cakes</h3>
+                    <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.9);">Design your perfect cake for any occasion. Choose from our delicious flavors and customize size, design, and message.</p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: 25px; text-align: left;">
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            8+ Premium Flavors
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            Custom Messages
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            Multiple Size Options
+                        </li>
+                    </ul>
+                    <a href="{{ url_for('cakes') }}" class="primary-btn" style="background: #ffd700; color: #333; border: none;">Order Custom Cake</a>
+                </div>
+                <div class="celebration-card" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; flex: 1; min-width: 300px; max-width: 400px; text-align: center; transition: transform 0.3s;">
+                    <div class="card-icon" style="margin-bottom: 20px;">
+                        <span class="material-symbols-rounded" style="font-size: 48px;">celebration</span>
+                    </div>
+                    <h3 style="margin-bottom: 15px; color: #ffd700;">Party Packages</h3>
+                    <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.9);">Complete party solutions including food, cake, and decorations for birthdays, anniversaries, and corporate events.</p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: 25px; text-align: left;">
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            Customized Menu
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            Celebration Cake Included
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 10px;">check_circle</span>
+                            Professional Service
+                        </li>
+                    </ul>
+                    <a href="#" class="primary-btn" style="background: #ffd700; color: #333; border: none;">Enquire Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Items Section -->
+    <section class="popular-items">
+        <div class="container">
+            <div class="section-header">
+                <h2>Popular <span>Dishes</span></h2>
+                <p>Our customers' favorite meals from top local restaurants</p>
+            </div>
+            <div class="food-grid">
+                <div class="food-card">
+                    <div class="food-image">
+                        <!-- Placeholder for food image -->
+                        <div class="placeholder-image"></div>
+                    </div>
+                    <div class="food-info">
+                        <h3>Butter Chicken</h3>
+                        <p>Creamy, rich curry with tender chicken pieces and butter</p>
+                        <div class="food-meta">
+                            <span class="price">₹350</span>
+                            <a href="#" class="add-to-cart">
+                                <span class="material-symbols-rounded">add_shopping_cart</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-card">
+                    <div class="food-image">
+                        <!-- Placeholder for food image -->
+                        <div class="placeholder-image"></div>
+                    </div>
+                    <div class="food-info">
+                        <h3>Paneer Tikka</h3>
+                        <p>Grilled cottage cheese marinated in spices and yogurt</p>
+                        <div class="food-meta">
+                            <span class="price">₹280</span>
+                            <a href="#" class="add-to-cart">
+                                <span class="material-symbols-rounded">add_shopping_cart</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-card">
+                    <div class="food-image">
+                        <!-- Placeholder for food image -->
+                        <div class="placeholder-image"></div>
+                    </div>
+                    <div class="food-info">
+                        <h3>Biryani</h3>
+                        <p>Fragrant basmati rice cooked with aromatic spices and choice of meat</p>
+                        <div class="food-meta">
+                            <span class="price">₹320</span>
+                            <a href="#" class="add-to-cart">
+                                <span class="material-symbols-rounded">add_shopping_cart</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="view-more">
+                <a href="{{ url_for('menu') }}" class="secondary-btn">View Full Menu</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Order?</h2>
+                <p>Download our app for a better ordering experience</p>
+                <div class="app-buttons">
+                    <a href="#" class="app-btn">
+                        <span class="material-symbols-rounded">smartphone</span>
+                        Google Play
+                    </a>
+                    <a href="#" class="app-btn">
+                        <span class="material-symbols-rounded">phone_iphone</span>
+                        App Store
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Dish Details - Restaurant Name{% endblock %}
+
+{% block content %}
+<div class="dish-detail-container">
+    <h1>Dish Details</h1>
+    <p>You are viewing details for dish: {{ dish_id }}</p>
+    
+    <!-- In a real application, you would display actual dish details here -->
+    <p>This is a placeholder for dish details. In a complete implementation, you would:</p>
+    <ul>
+        <li>Fetch the dish details from a database using the dish_id</li>
+        <li>Display a larger image of the dish</li>
+        <li>Show ingredients, nutritional information, etc.</li>
+        <li>Provide options for customization</li>
+        <li>Allow users to add to cart with quantity selection</li>
+    </ul>
+    
+    <a href="/menu" class="back-button">Back to Menu</a>
+</div>
+{% endblock %}

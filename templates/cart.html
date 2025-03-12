@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - GustoGo{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Your Shopping Cart</h1>
+        <p>Review and modify your order before checkout</p>
+    </div>
+
+    <div class="cart-content">
+        {% if cart and cart.items %}
+            <div class="cart-items-section">
+                {% for item in cart.items %}
+                <div class="cart-item">
+                    <div class="item-image">
+                        {% if item.item_type == 'menu_item' or item.item_type == 'menu' %}
+                            <img src="{{ url_for('static', filename='images/food-placeholder.jpg') }}" alt="{{ item.get_item().name if item.get_item() else 'Menu Item' }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='images/cake-placeholder.jpg') }}" alt="Cake">
+                        {% endif %}
+                    </div>
+                    <div class="item-details">
+                        <div class="item-info">
+                            <h3>{{ item.get_item().name if item.get_item() else 'Unknown Item' }}</h3>
+                            <p class="item-type">{{ item.item_type|replace('_', ' ')|title }}</p>
+                            {% if item.item_type == 'cake' %}
+                                <div class="item-price-details">
+                                    <p class="size">Size: {{ item.size_kg|default(1) }}kg</p>
+                                </div>
+                            {% endif %}
+                            <p class="item-price">₹{{ "%.2f"|format(item.get_subtotal()) }}</p>
+                        </div>
+                        <div class="item-actions">
+                            <div class="quantity-control">
+                                <form action="{{ url_for('update_cart_item', item_id=item.id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="action" value="decrease">
+                                    <button type="submit" class="quantity-btn minus-btn">-</button>
+                                </form>
+                                <span class="quantity">{{ item.quantity }}</span>
+                                <form action="{{ url_for('update_cart_item', item_id=item.id) }}" method="POST" style="display: inline;">
+                                    <input type="hidden" name="action" value="increase">
+                                    <button type="submit" class="quantity-btn plus-btn">+</button>
+                                </form>
+                            </div>
+                            <form action="{{ url_for('remove_cart_item', item_id=item.id) }}" method="POST" class="remove-form">
+                                <button type="submit" class="remove-btn" onclick="return confirm('Are you sure you want to remove this item?')">
+                                    <span class="material-symbols-rounded">delete</span>
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="cart-summary-section">
+                <div class="cart-summary">
+                    <h2>Order Summary</h2>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span>₹{{ "%.2f"|format(cart.get_subtotal()) }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery Fee</span>
+                        <span>₹{{ "%.2f"|format(cart.get_delivery_fee()) }}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span>₹{{ "%.2f"|format(cart.get_total()) }}</span>
+                    </div>
+                    <a href="{{ url_for('checkout') }}" class="checkout-btn">Proceed to Checkout</a>
+                    <a href="{{ url_for('menu') }}" class="continue-shopping">Continue Shopping</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="empty-cart">
+                <span class="material-symbols-rounded">shopping_cart</span>
+                <h2>Your cart is empty</h2>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <a href="{{ url_for('menu') }}" class="browse-menu-btn">Browse Menu</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .cart-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .cart-header h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .cart-header p {
+        color: #666;
+    }
+
+    .cart-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .cart-items-section {
+        flex: 1 1 65%;
+        min-width: 300px;
+    }
+
+    .cart-summary-section {
+        flex: 1 1 30%;
+        min-width: 300px;
+        position: sticky;
+        top: 2rem;
+        align-self: flex-start;
+    }
+
+    .cart-item {
+        display: flex;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .item-image {
+        width: 100px;
+        height: 100px;
+        overflow: hidden;
+        border-radius: 8px;
+        margin-right: 1.5rem;
+    }
+
+    .item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-details {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .item-info {
+        flex: 1;
+    }
+
+    .item-info h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-type {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-price {
+        color: #e44d26;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .item-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .quantity-control form {
+        display: inline-block;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: all 0.3s;
+        padding: 0;
+    }
+
+    .quantity-btn:hover {
+        background: #f8f9fa;
+        border-color: #e44d26;
+        color: #e44d26;
+    }
+
+    .minus-btn, .plus-btn {
+        font-weight: bold;
+    }
+
+    .quantity {
+        margin: 0 0.5rem;
+        font-weight: 600;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    .remove-form {
+        display: inline-block;
+    }
+
+    .remove-form .remove-btn {
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: color 0.3s;
+        padding: 0.5rem;
+    }
+
+    .remove-form .remove-btn:hover {
+        color: #e44d26;
+    }
+
+    .remove-btn .material-symbols-rounded {
+        font-size: 1.2rem;
+        margin-right: 0.25rem;
+    }
+
+    .cart-summary {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+
+    .cart-summary h2 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        color: #666;
+    }
+
+    .summary-row.total {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #333;
+    }
+
+    .checkout-btn {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background: #e44d26;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 1.5rem;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .checkout-btn:hover {
+        background: #d13b1e;
+    }
+
+    .continue-shopping {
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        color: #666;
+        text-decoration: none;
+    }
+
+    .continue-shopping:hover {
+        color: #333;
+    }
+
+    .empty-cart {
+        width: 100%;
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-cart .material-symbols-rounded {
+        font-size: 5rem;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-cart h2 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-cart p {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .browse-menu-btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background: #e44d26;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .browse-menu-btn:hover {
+        background: #d13b1e;
+    }
+
+    @media (max-width: 768px) {
+        .cart-content {
+            flex-direction: column;
+        }
+
+        .item-details {
+            flex-direction: column;
+        }
+
+        .item-actions {
+            flex-direction: row;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .quantity-control {
+            margin-bottom: 0;
+            margin-right: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any additional JavaScript functionality here if needed
+});
+</script>
+{% endblock %} 

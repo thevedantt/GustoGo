@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation - GustoGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-section {
+        padding: 60px 0;
+        background: #f9f9f9;
+    }
+
+    .confirmation-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .confirmation-box {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 40px;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .success-icon {
+        color: #4CAF50;
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .order-number {
+        font-size: 24px;
+        color: #e44d26;
+        margin: 20px 0;
+    }
+
+    .order-details {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+
+    .detail-section {
+        margin-bottom: 30px;
+    }
+
+    .detail-section h3 {
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .cake-details {
+        background: #fff5f3;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+
+    .cake-image {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin: 0 auto 20px;
+        display: block;
+    }
+
+    .total-price {
+        font-size: 24px;
+        font-weight: 600;
+        color: #e44d26;
+        text-align: right;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #eee;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #e44d26;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 20px;
+        transition: background 0.3s;
+    }
+
+    .back-btn:hover {
+        background: #d13b1e;
+    }
+
+    @media (max-width: 768px) {
+        .confirmation-box,
+        .order-details {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="confirmation-section">
+    <div class="confirmation-container">
+        <div class="confirmation-box">
+            <span class="material-symbols-rounded success-icon">check_circle</span>
+            <h2>Thank You for Your Cake Order!</h2>
+            <p class="order-number">Order #{{ order.id }}</p>
+            <p>We've received your custom cake order and will begin preparing it right away.</p>
+        </div>
+
+        <div class="order-details">
+            <div class="detail-section">
+                <h3>Order Details</h3>
+                <div class="cake-details">
+                    {% if order.flavor.image_url %}
+                    <img src="{{ order.flavor.image_url }}" alt="{{ order.flavor.name }}" class="cake-image">
+                    {% endif %}
+                    <div class="detail-row">
+                        <span class="detail-label">Cake Flavor:</span>
+                        <span>{{ order.flavor.name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Size:</span>
+                        <span>{{ order.size_kg }} kg</span>
+                    </div>
+                    {% if order.message %}
+                    <div class="detail-row">
+                        <span class="detail-label">Cake Message:</span>
+                        <span>{{ order.message }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Customer Name:</span>
+                    <span>{{ order.customer_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span>{{ order.customer_email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone:</span>
+                    <span>{{ order.customer_phone }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Delivery Address:</span>
+                    <span>{{ order.delivery_address }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Delivery Date:</span>
+                    <span>{{ order.delivery_date.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                </div>
+                {% if order.special_instructions %}
+                <div class="detail-row">
+                    <span class="detail-label">Special Instructions:</span>
+                    <span>{{ order.special_instructions }}</span>
+                </div>
+                {% endif %}
+
+                <div class="total-price">
+                    Total: ₹{{ "%.2f"|format(order.total_price) }}
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="{{ url_for('index') }}" class="back-btn">Back to Home</a>
+        </div>
+    </div>
+</section>
+{% endblock %} 

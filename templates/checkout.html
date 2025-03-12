@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - GustoGo{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Complete your order</p>
+    </div>
+
+    <div class="checkout-content">
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="cart-items">
+                {% if cart and cart.items %}
+                    {% for item in cart.items %}
+                    <div class="cart-item">
+                        <div class="item-details">
+                            {% if item.item_type == 'menu_item' or item.item_type == 'menu' %}
+                                <h3>{{ item.get_item().name if item.get_item() else 'Unknown Item' }}</h3>
+                                <p class="quantity">Quantity: {{ item.quantity }}</p>
+                                <p class="price">₹{{ "%.2f"|format(item.get_item().price if item.get_item() else 0) }} each</p>
+                            {% elif item.item_type == 'cake' %}
+                                <h3>{{ item.get_item().name if item.get_item() else 'Unknown Cake' }} Cake</h3>
+                                <p class="size">Size: {{ item.size_kg }}kg</p>
+                                <p class="price">₹{{ "%.2f"|format(item.get_subtotal()) }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Your cart is empty. <a href="{{ url_for('menu') }}">Browse our menu</a> to add items.</p>
+                {% endif %}
+            </div>
+            
+            <div class="order-total">
+                <div class="subtotal">
+                    <span>Subtotal:</span>
+                    <span>₹{{ "%.2f"|format(cart.get_subtotal() if cart else 0) }}</span>
+                </div>
+                <div class="delivery">
+                    <span>Delivery Fee:</span>
+                    <span>₹{{ "%.2f"|format(cart.get_delivery_fee() if cart else 0) }}</span>
+                </div>
+                <div class="total">
+                    <span>Total:</span>
+                    <span>₹{{ "%.2f"|format(cart.get_total() if cart else 0) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="payment-section">
+            <h2>Delivery Information</h2>
+            <form action="{{ url_for('checkout') }}" method="post" id="payment-form">
+                <input type="hidden" name="total_amount" value="{{ cart.get_total() if cart else 0 }}">
+                
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <textarea id="address" name="address" required></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="city">City</label>
+                        <input type="text" id="city" name="city" required>
+                    </div>
+                    
+                    <div class="form-group half">
+                        <label for="pincode">Pincode</label>
+                        <input type="text" id="pincode" name="pincode" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instructions">Delivery Instructions (Optional)</label>
+                    <textarea id="instructions" name="instructions"></textarea>
+                </div>
+                
+                <div class="payment-options">
+                    <h3>Payment Method</h3>
+                    <div class="payment-option">
+                        <input type="radio" id="cod" name="payment_method" value="cash_on_delivery" checked>
+                        <label for="cod">Cash on Delivery</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="payment-button">Complete Order</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-container {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .checkout-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .checkout-header h1 {
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .checkout-header p {
+        color: #666;
+    }
+
+    .checkout-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+
+    .order-summary {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+
+    .order-summary h2 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .cart-items {
+        margin-bottom: 1.5rem;
+    }
+
+    .cart-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .item-details h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+
+    .item-details p {
+        color: #666;
+        margin-bottom: 0.25rem;
+    }
+
+    .price {
+        color: #e44d26;
+        font-weight: 500;
+    }
+
+    .order-total {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .order-total > div {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .total {
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #eee;
+    }
+
+    .payment-section {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+    }
+
+    .payment-section h2 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .form-group.half {
+        flex: 1;
+    }
+    
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+    
+    input, textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    
+    textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+
+    .payment-button {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1.5rem;
+        background: #e44d26;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .payment-button:hover {
+        background: #d13b1e;
+    }
+
+    .payment-options {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .payment-options h3 {
+        color: #333;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .payment-option {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .payment-option input[type="radio"] {
+        width: auto;
+        margin-right: 0.5rem;
+    }
+
+    .payment-option label {
+        display: inline;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .checkout-content {
+            flex-direction: column;
+        }
+        
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+    }
+</style>
+{% endblock %} 

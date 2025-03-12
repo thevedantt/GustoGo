@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmation - GustoGo{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="confirmation-box">
+        <div class="success-icon">
+            <span class="material-symbols-rounded">check_circle</span>
+        </div>
+        <h1>Order Placed Successfully!</h1>
+        <p>Thank you for your order. We've received your order and will begin processing it right away.</p>
+        
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <p>Your order has been confirmed. You will receive an email confirmation shortly.</p>
+            <p>Estimated delivery time: 30-45 minutes</p>
+        </div>
+        
+        <div class="action-buttons">
+            <a href="{{ url_for('menu') }}" class="btn btn-primary">Continue Shopping</a>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Return to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .confirmation-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+        background: #f8f9fa;
+    }
+    
+    .confirmation-box {
+        max-width: 600px;
+        width: 100%;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        padding: 3rem 2rem;
+        text-align: center;
+    }
+    
+    .success-icon {
+        margin-bottom: 1.5rem;
+    }
+    
+    .success-icon .material-symbols-rounded {
+        font-size: 5rem;
+        color: #4CAF50;
+    }
+    
+    h1 {
+        color: #333;
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+    
+    p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .order-details {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        text-align: left;
+    }
+    
+    .order-details h2 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .order-details p {
+        margin-bottom: 0.5rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary {
+        background: #e44d26;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #d13b1e;
+    }
+    
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+    
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+    
+    @media (max-width: 768px) {
+        .confirmation-box {
+            padding: 2rem 1rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+{% endblock %} 

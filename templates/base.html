@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GustoGo{% endblock %}</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+    <style>
+        .cart-icon {
+            position: relative;
+            text-decoration: none;
+            color: #1a1a1a;  /* Darker color */
+            margin-right: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-radius: 50%;
+            background: #f5f5f5;  /* Light background */
+        }
+
+        .cart-icon:hover {
+            transform: scale(1.1);
+            background: #e0e0e0;  /* Slightly darker on hover */
+        }
+
+        .cart-icon .material-symbols-rounded {
+            font-size: 28px;  /* Larger icon */
+            transition: color 0.3s ease;
+        }
+
+        .cart-icon:hover .material-symbols-rounded {
+            color: #1a1a1a;  /* Darker on hover */
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #1a1a1a;  /* Dark background */
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 50%;
+            min-width: 18px;
+            text-align: center;
+            animation: pop 0.3s ease-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);  /* Add shadow */
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .flash-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            background: #4CAF50;
+            color: white;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .flash-message.error {
+            background: #f44336;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Ensure cart icon is visible on mobile */
+        @media (max-width: 768px) {
+            .cart-icon {
+                margin-right: 10px;
+            }
+            
+            .cart-icon .material-symbols-rounded {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">
+                    <span class="logo-text">GustoGo</span>
+                </a>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Home</a></li>
+                    <li><a href="{{ url_for('menu') }}" {% if request.endpoint == 'menu' %}class="active"{% endif %}>Menu</a></li>
+                    <li><a href="{{ url_for('cakes') }}" {% if request.endpoint == 'cakes' %}class="active"{% endif %}>Cakes</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+            <div class="nav-action">
+                <a href="{{ url_for('view_cart') }}" class="cart-icon" title="View Cart" aria-label="Shopping Cart">
+                    <span class="material-symbols-rounded">shopping_cart</span>
+                    {% if get_cart_count() > 0 %}
+                    <span class="cart-count">{{ get_cart_count() }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('menu') }}" class="order-btn">Order Now</a>
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {% if category == 'error' %}error{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <span class="logo-text">GustoGo</span>
+                    <p>Delicious food delivered to your doorstep</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="{{ url_for('index') }}">Home</a></li>
+                            <li><a href="{{ url_for('menu') }}">Menu</a></li>
+                            <li><a href="{{ url_for('cakes') }}">Cakes</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Contact Us</h3>
+                        <ul>
+                            <li><span class="material-symbols-rounded">location_on</span> 123 Food Street, Cuisine City</li>
+                            <li><span class="material-symbols-rounded">call</span> (555) 123-4567</li>
+                            <li><span class="material-symbols-rounded">mail</span> info@gustogo.com</li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Follow Us</h3>
+                        <div class="social-icons">
+                            <a href="#"><span class="material-symbols-rounded">facebook</span></a>
+                            <a href="#"><span class="material-symbols-rounded">twitter</span></a>
+                            <a href="#"><span class="material-symbols-rounded">instagram</span></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GustoGo. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+    <script>
+        // Auto-hide flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.animation = 'slideOut 0.3s ease-in forwards';
+                    setTimeout(() => message.remove(), 300);
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>
