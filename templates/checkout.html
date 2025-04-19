@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - GustoGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<section class="checkout-page">
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>Checkout</h1>
+            <p>Complete your order information</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-form-container">
+                    <form method="post" class="checkout-form" id="payment-form">
+                        {{ form.csrf_token }}
+                        {{ form.stripe_token }}
+                        
+                        <div class="section-title">
+                            <h3>Personal Information</h3>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), 
+                                    placeholder="Enter first name",
+                                    value=current_user.first_name or current_user.username if current_user.is_authenticated else "") }}
+                                {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), 
+                                    placeholder="Enter last name",
+                                    value=current_user.last_name or '' if current_user.is_authenticated else "") }}
+                                {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
+                                placeholder="Enter email address", 
+                                value=current_user.email if current_user.is_authenticated else "") }}
+                            {% for error in form.email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), 
+                                placeholder="Enter phone number", 
+                                value=current_user.phone if current_user.is_authenticated else "") }}
+                            {% for error in form.phone.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        {% if current_user.is_authenticated and current_user.address %}
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="use_saved_address" name="use_saved_address" checked>
+                            <label class="form-check-label" for="use_saved_address">Use my saved address</label>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3" id="address_container">
+                            <label for="address" class="form-label">Delivery Address</label>
+                            {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), 
+                                placeholder="Enter your full address", 
+                                rows=3, 
+                                value=current_user.address or '' if current_user.is_authenticated else "") }}
+                            {% for error in form.address.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="section-title mt-4">
+                            <h3>Payment Information</h3>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Payment Method</label>
+                            <div class="payment-methods-options">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_card" value="card" checked>
+                                    <label class="form-check-label" for="payment_card">
+                                        <i class="fab fa-cc-visa me-2"></i>
+                                        <i class="fab fa-cc-mastercard me-2"></i>
+                                        <i class="fab fa-cc-amex me-2"></i>
+                                        Credit/Debit Card
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_upi" value="upi">
+                                    <label class="form-check-label" for="payment_upi">
+                                        <i class="fas fa-mobile-alt me-2"></i>
+                                        UPI Payment
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="payment_method" id="payment_cod" value="cod">
+                                    <label class="form-check-label" for="payment_cod">
+                                        <i class="fas fa-money-bill-wave me-2"></i>
+                                        Cash on Delivery
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card Payment Section -->
+                        <div id="card_payment_section">
+                            <div class="mb-3">
+                                <label for="card-element" class="form-label">Credit or Debit Card</label>
+                                <div id="card-element" class="form-control">
+                                    <!-- Stripe Card Element will be inserted here -->
+                                </div>
+                                <div id="card-errors" class="invalid-feedback" role="alert"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- UPI Payment Section -->
+                        <div id="upi_payment_section" style="display: none;">
+                            <div class="mb-3">
+                                <label for="upi_id" class="form-label">UPI ID</label>
+                                <input type="text" class="form-control" id="upi_id" name="upi_id" placeholder="Enter your UPI ID (e.g., 1234567890@upi)" required>
+                                <small class="form-text text-muted">We accept all major UPI apps like Google Pay, PhonePe, Paytm, etc.</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Cash on Delivery Section -->
+                        <div id="cod_payment_section" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Please have the exact amount ready for the delivery person. A small convenience fee may apply.
+                            </div>
+                        </div>
+                        
+                        <div class="section-title mt-4">
+                            <h3>Order Notes (Optional)</h3>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.notes(class="form-control", placeholder="Special instructions for delivery or food preparation", rows=3) }}
+                        </div>
+                        
+                        <div class="checkout-actions">
+                            <a href="{{ url_for('main.cart') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submit-button">
+                                <span id="button-text">Pay Now</span>
+                                <div id="spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div class="order-items">
+                        {% for item in cart_items %}
+                        <div class="order-item">
+                            {% if item.item_type == 'menu' and item.menu_item %}
+                            <div class="order-item-details">
+                                <h5>{{ item.menu_item.name }}</h5>
+                                <span class="order-item-quantity">x{{ item.quantity }}</span>
+                            </div>
+                            <div class="order-item-price">₹{{ "%.2f"|format(item.calculate_price()) }}</div>
+                            {% elif item.item_type == 'cake' %}
+                            {% set cake_details = item.get_cake_details() %}
+                            <div class="order-item-details">
+                                <h5>{{ cake_details.name }}</h5>
+                                <span class="order-item-quantity">x{{ item.quantity }}</span>
+                                <div class="cake-details">
+                                    <small>{{ cake_details.size }} | {{ cake_details.flavor }} | {{ cake_details.frosting }}</small>
+                                </div>
+                            </div>
+                            <div class="order-item-price">₹{{ "%.2f"|format(item.calculate_price()) }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="order-summary-content">
+                        <div class="summary-item">
+                            <span>Subtotal:</span>
+                            <span>₹{{ "%.2f"|format(subtotal) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Delivery Fee:</span>
+                            <span>₹{{ "%.2f"|format(delivery_fee) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>GST (18%):</span>
+                            <span>₹{{ "%.2f"|format(gst) }}</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total:</span>
+                            <span>₹{{ "%.2f"|format(total) }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payment-info mt-4">
+                    <h5>Payment Information</h5>
+                    <p class="mb-2">We accept the following payment methods:</p>
+                    <div class="payment-methods">
+                        <i class="fab fa-cc-visa fa-2x me-2"></i>
+                        <i class="fab fa-cc-mastercard fa-2x me-2"></i>
+                        <i class="fab fa-cc-amex fa-2x me-2"></i>
+                        <i class="fab fa-cc-discover fa-2x"></i>
+                    </div>
+                    <p class="mt-3 mb-0 small">Your payment information is processed securely through Stripe.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    // Create a Stripe client
+    var stripe = Stripe('{{ stripe_public_key }}');
+    
+    // Create an instance of Elements
+    var elements = stripe.elements();
+    
+    // Create card Element
+    var card = elements.create('card', {
+        style: {
+            base: {
+                color: '#32325d',
+                fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': {
+                    color: '#aab7c4'
+                }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        }
+    });
+    
+    // Add an instance of the card Element into the `card-element` div
+    card.mount('#card-element');
+    
+    // Handle real-time validation errors from the card Element
+    card.addEventListener('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+            displayError.style.display = 'block';
+        } else {
+            displayError.textContent = '';
+            displayError.style.display = 'none';
+        }
+    });
+
+    // Handle saved address checkbox
+    const useSavedAddressCheckbox = document.getElementById('use_saved_address');
+    const addressContainer = document.getElementById('address_container');
+    const addressField = document.getElementById('address');
+    
+    if (useSavedAddressCheckbox) {
+        useSavedAddressCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                addressField.value = '{{ current_user.address or "" }}';
+            } else {
+                addressField.value = '';
+            }
+        });
+    }
+    
+    // Handle payment method switching
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const cardSection = document.getElementById('card_payment_section');
+    const upiSection = document.getElementById('upi_payment_section');
+    const codSection = document.getElementById('cod_payment_section');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            if (this.value === 'card') {
+                cardSection.style.display = 'block';
+                upiSection.style.display = 'none';
+                codSection.style.display = 'none';
+                buttonText.textContent = 'Pay Now';
+            } else if (this.value === 'upi') {
+                cardSection.style.display = 'none';
+                upiSection.style.display = 'block';
+                codSection.style.display = 'none';
+                buttonText.textContent = 'Proceed to UPI Payment';
+            } else if (this.value === 'cod') {
+                cardSection.style.display = 'none';
+                upiSection.style.display = 'none';
+                codSection.style.display = 'block';
+                buttonText.textContent = 'Place Order';
+            }
+        });
+    });
+    
+    // Handle form submission
+    var form = document.getElementById('payment-form');
+    var spinner = document.getElementById('spinner');
+    var stripeToken = document.getElementById('stripe_token');
+    
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        // Disable the submit button to prevent repeated clicks
+        submitButton.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        if (selectedPaymentMethod === 'card') {
+            stripe.createToken(card).then(function(result) {
+                if (result.error) {
+                    // Inform the user if there was an error
+                    var errorElement = document.getElementById('card-errors');
+                    errorElement.textContent = result.error.message;
+                    errorElement.style.display = 'block';
+                    
+                    // Re-enable the submit button
+                    submitButton.disabled = false;
+                    spinner.classList.add('d-none');
+                } else {
+                    // Set the token value
+                    stripeToken.value = result.token.id;
+                    
+                    // Submit the form
+                    form.submit();
+                }
+            });
+        } else if (selectedPaymentMethod === 'upi') {
+            const upiId = document.getElementById('upi_id').value;
+            if (!upiId) {
+                alert('Please enter your UPI ID');
+                submitButton.disabled = false;
+                spinner.classList.add('d-none');
+                return;
+            }
+            // For UPI, we'll just submit the form with the UPI ID
+            form.submit();
+        } else if (selectedPaymentMethod === 'cod') {
+            // For COD, we'll just submit the form
+            form.submit();
+        }
+    });
+</script>
+{% endblock %}
