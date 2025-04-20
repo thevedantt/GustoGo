@@ -1,0 +1,95 @@
+{
+    "coupons": [
+        {
+            "code": "WEEKEND20",
+            "discount_type": "percentage",
+            "discount_value": 20,
+            "min_order_value": 500,
+            "max_discount": 200,
+            "is_active": true,
+            "usage_limit": 1000,
+            "applicable_days": "Saturday,Sunday"
+        },
+        {
+            "code": "MONDAYMAGIC",
+            "discount_type": "percentage",
+            "discount_value": 15,
+            "min_order_value": 300,
+            "max_discount": 150,
+            "is_active": true,
+            "usage_limit": 500,
+            "applicable_days": "Monday"
+        },
+        {
+            "code": "FLAT100",
+            "discount_type": "fixed",
+            "discount_value": 100,
+            "min_order_value": 1000,
+            "is_active": true,
+            "usage_limit": 200
+        },
+        {
+            "code": "WEEKDAY10",
+            "discount_type": "percentage",
+            "discount_value": 10,
+            "min_order_value": 400,
+            "max_discount": 100,
+            "is_active": true,
+            "usage_limit": 1000,
+            "applicable_days": "Monday,Tuesday,Wednesday,Thursday,Friday"
+        },
+        {
+            "code": "FIRSTORDER",
+            "discount_type": "percentage",
+            "discount_value": 25,
+            "min_order_value": 200,
+            "max_discount": 250,
+            "is_active": true,
+            "usage_limit": 1
+        },
+        {
+            "code": "BIRTHDAY",
+            "discount_type": "percentage",
+            "discount_value": 30,
+            "min_order_value": 1000,
+            "max_discount": 300,
+            "is_active": true,
+            "usage_limit": 1
+        },
+        {
+            "code": "FESTIVE50",
+            "discount_type": "percentage",
+            "discount_value": 50,
+            "min_order_value": 2000,
+            "max_discount": 500,
+            "is_active": true,
+            "usage_limit": 100
+        },
+        {
+            "code": "LUNCHTIME",
+            "discount_type": "percentage",
+            "discount_value": 15,
+            "min_order_value": 300,
+            "max_discount": 150,
+            "is_active": true,
+            "usage_limit": 500
+        },
+        {
+            "code": "DINNER20",
+            "discount_type": "percentage",
+            "discount_value": 20,
+            "min_order_value": 800,
+            "max_discount": 200,
+            "is_active": true,
+            "usage_limit": 300
+        },
+        {
+            "code": "FLAT50",
+            "discount_type": "fixed",
+            "discount_value": 50,
+            "min_order_value": 500,
+            "is_active": true,
+            "usage_limit": 1000
+        }
+    ]
+} 

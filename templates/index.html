@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block title %}GustoGo - Food Delivery & Cake Customization{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background-color: #f0f5ff;
+    }
+    
+    .hero {
+        background-color: #1c2b4a;
+        padding: 100px 0;
+        color: #fff;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #e8c468;
+    }
+    
+    .hero-title .accent-text {
+        color: #f4603e;
+    }
+    
+    .hero-title .second-line {
+        display: block;
+        margin-top: 10px;
+    }
+    
+    .hero-text {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        color: #fff;
+    }
+    
+    .hero-buttons .btn {
+        margin-right: 15px;
+    }
+    
+    .btn-primary {
+        background-color: #e8c468;
+        border-color: #e8c468;
+        color: #1c2b4a;
+    }
+    
+    .btn-outline-primary {
+        border-color: #e8c468;
+        color: #e8c468;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #e8c468;
+        color: #1c2b4a;
+    }
+    
+    /* Features Section */
+    .features {
+        padding: 80px 0;
+        background-color: #f0f5ff;
+    }
+    
+    .feature-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background-color: #e8c468;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #1c2b4a;
+        font-size: 2rem;
+    }
+    
+    /* Popular Items Section */
+    .popular-items {
+        padding: 80px 0;
+        background-color: #f0f5ff;
+    }
+    
+    /* How It Works Section */
+    .how-it-works {
+        padding: 80px 0;
+        background-color: #f0f5ff;
+    }
+    
+    .step-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .step-number {
+        width: 60px;
+        height: 60px;
+        background-color: #e8c468;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #1c2b4a;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+    
+    .cta-card {
+        background-color: #1c2b4a;
+        border-radius: 12px;
+        padding: 40px;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="hero-title">
+                    Delicious Food
+                    <span class="second-line">
+                        <span class="accent-text">Delivered</span> To Your Door
+                    </span>
+                </h1>
+                <p class="hero-text">Order your favorite meals or customize a special cake for any occasion. Fast delivery, great taste!</p>
+                <div class="hero-buttons">
+                    <a href="{{ url_for('main.menu') }}" class="btn btn-primary btn-lg">Explore Menu</a>
+                    <a href="{{ url_for('main.cake') }}" class="btn btn-outline-primary btn-lg">Custom Cake</a>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center">
+                <div class="hero-image">
+                    <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="200" r="180" fill="#e8c468" opacity="0.1"/>
+                        <circle cx="200" cy="200" r="150" fill="#fff" opacity="0.2"/>
+                        <circle cx="200" cy="200" r="120" fill="#e8c468" opacity="0.1"/>
+                        <path d="M200 100 C 300 100, 300 300, 200 300 C 100 300, 100 100, 200 100 Z" fill="#e8c468" opacity="0.8"/>
+                        <circle cx="200" cy="200" r="50" fill="#fff"/>
+                        <circle cx="200" cy="200" r="30" fill="#e8c468"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2>Why Choose GustoGo?</h2>
+            <p>We pride ourselves on providing the best food ordering experience</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Delicious Food</h3>
+                    <p>We partner with the finest restaurants to bring you the best flavors in town.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3>Fast Delivery</h3>
+                    <p>Our dedicated delivery team ensures your food arrives hot and fresh.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <h3>Custom Cakes</h3>
+                    <p>Design your perfect cake for any special occasion with our customization tool.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Items Section -->
+<section class="popular-items">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2>Popular Items</h2>
+            <p>Our customers' favorite dishes that you might enjoy too</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="menu-item-card">
+                    <div class="menu-item-image">
+                        <img src="{{ url_for('static', filename='images/margheritapizza.jpg') }}" alt="Margherita Pizza">
+                        <span class="category-tag">Main Course</span>
+                    </div>
+                    <div class="menu-item-body">
+                        <h4>Margherita Pizza</h4>
+                        <p class="menu-item-description">Classic pizza with tomato sauce, mozzarella, and basil</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">₹499.00</span>
+                            <form action="{{ url_for('main.add_to_cart', menu_item_id=7) }}" method="POST">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="menu-item-card">
+                    <div class="menu-item-image">
+                        <img src="{{ url_for('static', filename='images/cheeseburger.jpg') }}" alt="Cheeseburger">
+                        <span class="category-tag">Main Course</span>
+                    </div>
+                    <div class="menu-item-body">
+                        <h4>Cheeseburger</h4>
+                        <p class="menu-item-description">Beef patty with cheese, lettuce, tomato, and special sauce</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">₹399.00</span>
+                            <form action="{{ url_for('main.add_to_cart', menu_item_id=8) }}" method="POST">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="menu-item-card">
+                    <div class="menu-item-image">
+                        <img src="{{ url_for('static', filename='images/chocolatebrownie.webp') }}" alt="Chocolate Brownie">
+                        <span class="category-tag">Desserts</span>
+                    </div>
+                    <div class="menu-item-body">
+                        <h4>Chocolate Brownie</h4>
+                        <p class="menu-item-description">Warm chocolate brownie with vanilla ice cream</p>
+                        <div class="menu-item-footer">
+                            <span class="menu-item-price">₹299.00</span>
+                            <form action="{{ url_for('main.add_to_cart', menu_item_id=11) }}" method="POST">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('main.menu') }}" class="btn btn-outline-primary">View Full Menu</a>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2>How It Works</h2>
+            <p>Ordering from GustoGo is easy as 1-2-3</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Choose Your Food</h3>
+                    <p>Browse our menu and select your favorite dishes or customize a cake.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Place Your Order</h3>
+                    <p>Add items to your cart, review your order, and proceed to checkout.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Enjoy Your Meal</h3>
+                    <p>Pay securely online and wait for your delicious food to arrive at your doorstep.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-card">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2>Ready to Order?</h2>
+                    <p>Satisfy your cravings with just a few clicks. Order now and enjoy!</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{{ url_for('main.menu') }}" class="btn btn-primary btn-lg">Order Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

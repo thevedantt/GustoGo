@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+
+{% block title %}Menu - GustoGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .menu-page {
+        padding: 80px 0;
+        background-color: #f0f5ff;
+    }
+    
+    .menu-page .container {
+        background-color: #1c2b4a;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .page-header {
+        color: #ffffff;
+        margin-bottom: 40px;
+    }
+    
+    .page-header h1 {
+        color: #e8c468;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .page-header p {
+        color: #ffffff;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .menu-categories {
+        margin-bottom: 40px;
+    }
+    
+    .nav-pills .nav-link {
+        color: #e8c468;
+        border: 2px solid #e8c468;
+        margin: 0 5px;
+        border-radius: 50px;
+        padding: 8px 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-pills .nav-link:hover {
+        background-color: rgba(232, 196, 104, 0.1);
+    }
+    
+    .nav-pills .nav-link.active {
+        background-color: #e8c468;
+        color: #1c2b4a;
+        font-weight: 600;
+    }
+    
+    .menu-item-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .menu-item-card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .menu-item-image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .menu-item-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .menu-item-card:hover .menu-item-image img {
+        transform: scale(1.1);
+    }
+    
+    .category-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: #1c2b4a;
+        color: #e8c468;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .menu-item-body {
+        padding: 20px;
+    }
+    
+    .menu-item-body h4 {
+        color: #1c2b4a;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .menu-item-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+    
+    .menu-item-price {
+        color: #f4603e;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .menu-item-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+    
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        margin: 0 20px;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 5px;
+        border: 2px solid #e8c468;
+    }
+    
+    .quantity-btn {
+        background-color: #e8c468;
+        color: #1c2b4a;
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+        background-color: #f4603e;
+        color: #ffffff;
+    }
+    
+    .quantity-input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-weight: bold;
+        color: #1c2b4a;
+    }
+    
+    .quantity-input:focus {
+        outline: none;
+    }
+    
+    .btn-primary {
+        background-color: #e8c468;
+        border-color: #e8c468;
+        color: #1c2b4a;
+        font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+        background-color: #f4603e;
+        border-color: #f4603e;
+        color: #ffffff;
+    }
+    
+    .empty-state {
+        color: #ffffff;
+    }
+    
+    .empty-state i {
+        color: #e8c468;
+    }
+    
+    .special-offers {
+        padding: 80px 0;
+        background-color: #ffffff;
+    }
+    
+    .offer-card {
+        background-color: #1c2b4a;
+        border-radius: 12px;
+        padding: 30px;
+        color: #ffffff;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .offer-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(232, 196, 104, 0.1), rgba(244, 96, 62, 0.1));
+    }
+    
+    .offer-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .offer-content h3 {
+        color: #e8c468;
+        margin-bottom: 15px;
+    }
+    
+    .offer-price {
+        margin: 20px 0;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #ffffff;
+        opacity: 0.7;
+        margin-right: 10px;
+    }
+    
+    .discount-price {
+        color: #f4603e;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .offer-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: #f4603e;
+        color: #ffffff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .btn-outline-primary {
+        border-color: #e8c468;
+        color: #e8c468;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #e8c468;
+        color: #1c2b4a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="menu-page">
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>Our Menu</h1>
+            <p>Explore our delicious offerings and find your favorites</p>
+        </div>
+        
+        <!-- Menu Categories -->
+        <div class="menu-categories">
+            <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link {% if not current_category %}active{% endif %}" href="{{ url_for('main.menu') }}">All Items</a>
+                </li>
+                {% for category in categories %}
+                <li class="nav-item">
+                    <a class="nav-link {% if current_category == category.id %}active{% endif %}" href="{{ url_for('main.menu', category=category.id) }}">{{ category.name }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Menu Items -->
+        <div class="row menu-items">
+            {% if menu_items %}
+                {% for item in menu_items %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="menu-item-card">
+                        <div class="menu-item-image">
+                            <img src="{{ url_for('static', filename='images/' + item.image_url if item.image_url else 'placeholder.svg') }}" alt="{{ item.name }}">
+                            <span class="category-tag">{{ item.category }}</span>
+                        </div>
+                        <div class="menu-item-body">
+                            <h4>{{ item.name }}</h4>
+                            <p class="menu-item-description">{{ item.description }}</p>
+                            <div class="menu-item-footer">
+                                <span class="menu-item-price">₹{{ "%.2f"|format(item.price) }}</span>
+                                <form action="{{ url_for('main.add_to_cart', menu_item_id=item.id) }}" method="POST" class="d-flex align-items-center">
+                                    <div class="quantity-control">
+                                        <div class="quantity-controls">
+                                            <button type="button" class="quantity-btn minus">-</button>
+                                            <input type="number" name="quantity" class="quantity-input" value="1" min="1" max="10">
+                                            <button type="button" class="quantity-btn plus">+</button>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Add</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <div class="empty-state">
+                        <i class="fas fa-utensils fa-4x mb-3"></i>
+                        <h3>No items found</h3>
+                        <p>No menu items available in this category at the moment.</p>
+                        <a href="{{ url_for('main.menu') }}" class="btn btn-primary mt-3">View All Categories</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Special Offers Section -->
+<section class="special-offers">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2>Special Offers</h2>
+            <p>Check out our limited-time deals</p>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="offer-card">
+                    <div class="offer-content">
+                        <h3>Family Meal Deal</h3>
+                        <p>Get 4 main courses, 2 sides, and 4 drinks at a special price!</p>
+                        <div class="offer-price">
+                            <span class="original-price">₹1199.99</span>
+                            <span class="discount-price">₹999.99</span>
+                        </div>
+                        <a href="{{ url_for('main.menu') }}" class="btn btn-outline-primary">Order Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="offer-card">
+                    <div class="offer-content">
+                        <h3>Custom Cake + Coffee</h3>
+                        <p>Order any custom cake and get 2 coffees free!</p>
+                        <div class="offer-badge">Limited Time</div>
+                        <a href="{{ url_for('main.cake') }}" class="btn btn-outline-primary">Customize Cake</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Remove any existing event listeners
+        const quantityButtons = document.querySelectorAll('.quantity-btn');
+        quantityButtons.forEach(button => {
+            button.replaceWith(button.cloneNode(true));
+        });
+
+        // Add new event listeners
+        document.querySelectorAll('.quantity-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const input = this.parentNode.querySelector('.quantity-input');
+                const currentValue = parseInt(input.value);
+                
+                if (this.classList.contains('minus') && currentValue > 1) {
+                    input.value = currentValue - 1;
+                } else if (this.classList.contains('plus') && currentValue < 10) {
+                    input.value = currentValue + 1;
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

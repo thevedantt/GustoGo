@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+
+{% block title %}Custom Cake - GustoGo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cake-customization {
+        padding: 80px 0;
+        background-color: #f0f5ff;
+    }
+    
+    .cake-customization .container {
+        background-color: #1c2b4a;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .page-header {
+        color: #ffffff;
+        margin-bottom: 40px;
+    }
+    
+    .page-header h1 {
+        color: #e8c468;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .page-header p {
+        color: #ffffff;
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .cake-preview {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .cake-preview-image {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .cake-price-preview {
+        background-color: #1c2b4a;
+        border-radius: 12px;
+        padding: 20px;
+        color: #ffffff;
+    }
+    
+    .cake-price-preview h3 {
+        color: #e8c468;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+    }
+    
+    .price-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .price-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .price-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .price-list .total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #e8c468;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 2px solid #e8c468;
+    }
+    
+    .cake-form-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .cake-form h3 {
+        color: #1c2b4a;
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    
+    .cake-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .cake-option {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .cake-option:hover {
+        background-color: #e8c468;
+        color: #1c2b4a;
+    }
+    
+    .cake-option .form-check-input:checked + .form-check-label {
+        color: #1c2b4a;
+        font-weight: 600;
+    }
+    
+    .option-price {
+        color: #f4603e;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    
+    .quantity-control-large {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 10px;
+        border: 2px solid #e8c468;
+        max-width: 200px;
+        margin: 0 auto;
+    }
+    
+    .quantity-btn {
+        background-color: #e8c468;
+        color: #1c2b4a;
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .quantity-btn:hover {
+        background-color: #f4603e;
+        color: #ffffff;
+    }
+    
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        font-weight: bold;
+        color: #1c2b4a;
+        font-size: 1.2rem;
+    }
+    
+    .quantity-input:focus {
+        outline: none;
+    }
+    
+    .btn-primary {
+        background-color: #e8c468;
+        border-color: #e8c468;
+        color: #1c2b4a;
+        font-weight: 600;
+        padding: 12px 30px;
+        font-size: 1.1rem;
+    }
+    
+    .btn-primary:hover {
+        background-color: #f4603e;
+        border-color: #f4603e;
+        color: #ffffff;
+    }
+    
+    .form-control {
+        border: 2px solid #e8c468;
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .form-control:focus {
+        border-color: #f4603e;
+        box-shadow: 0 0 0 0.2rem rgba(244, 96, 62, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="cake-customization">
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>Create Your Custom Cake</h1>
+            <p>Design the perfect cake for your special occasion</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="cake-preview">
+                    <div class="cake-preview-image">
+                        <!-- SVG for cake preview that updates based on selections -->
+                        <svg id="cake-svg" width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Base cake plate -->
+                            <ellipse cx="200" cy="330" rx="160" ry="30" fill="#e0e0e0" />
+                            
+                            <!-- Cake layers (will be updated via JS) -->
+                            <g id="cake-layers">
+                                <!-- Default cake (vanilla with buttercream) -->
+                                <path id="cake-bottom" d="M120,250 L280,250 C280,250 300,300 280,330 L120,330 C100,300 120,250 120,250 Z" fill="#f8e8c4" />
+                                <path id="cake-top" d="M140,200 L260,200 C260,200 280,230 260,250 L140,250 C120,230 140,200 140,200 Z" fill="#f8e8c4" />
+                                <path id="cake-frosting" d="M140,200 C140,200 170,180 200,190 C230,180 260,200 260,200 L260,210 C260,210 230,195 200,205 C170,195 140,210 140,210 Z" fill="#fff9e6" />
+                            </g>
+                            
+                            <!-- Cake topping (will be updated via JS) -->
+                            <g id="cake-topping">
+                                <!-- Default topping (none) -->
+                            </g>
+                            
+                            <!-- Cake message -->
+                            <text id="cake-message" x="200" y="290" text-anchor="middle" font-family="Poppins" font-size="16" fill="#333"></text>
+                        </svg>
+                    </div>
+                    <div class="cake-price-preview">
+                        <h3>Price Breakdown</h3>
+                        <ul class="price-list">
+                            <li>
+                                <span>Base (<span id="flavor-name">Vanilla</span>):</span>
+                                <span>₹<span id="base-price">20.00</span></span>
+                            </li>
+                            <li>
+                                <span>Size (<span id="size-name">Small (6")</span>):</span>
+                                <span>+₹<span id="size-price">0.00</span></span>
+                            </li>
+                            <li>
+                                <span>Frosting (<span id="frosting-name">Buttercream</span>):</span>
+                                <span>+₹<span id="frosting-price">0.00</span></span>
+                            </li>
+                            <li>
+                                <span>Topping (<span id="topping-name">None</span>):</span>
+                                <span>+₹<span id="topping-price">0.00</span></span>
+                            </li>
+                            <li class="total">
+                                <span>Total Price:</span>
+                                <span>₹<span id="total-price">20.00</span></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="cake-form-container">
+                    <form method="post" action="{{ url_for('main.cake') }}" class="cake-form">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-4">
+                            <h3>Step 1: Choose Cake Flavor</h3>
+                            <div class="cake-options">
+                                {% for flavor in flavors %}
+                                <div class="form-check cake-option">
+                                    <input class="form-check-input" type="radio" name="flavor" id="flavor-{{ flavor.id }}" value="{{ flavor.id }}" 
+                                        {% if loop.first %}checked{% endif %}
+                                        data-price="{{ flavor.price }}" data-name="{{ flavor.name }}">
+                                    <label class="form-check-label" for="flavor-{{ flavor.id }}">
+                                        {{ flavor.name }} 
+                                        <span class="option-price">₹{{ "%.2f"|format(flavor.price) }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3>Step 2: Choose Size</h3>
+                            <div class="cake-options">
+                                {% for size in sizes %}
+                                <div class="form-check cake-option">
+                                    <input class="form-check-input" type="radio" name="size" id="size-{{ size.id }}" value="{{ size.id }}" 
+                                        {% if loop.first %}checked{% endif %}
+                                        data-price="{{ size.price }}" data-name="{{ size.name }}">
+                                    <label class="form-check-label" for="size-{{ size.id }}">
+                                        {{ size.name }} 
+                                        {% if size.price > 0 %}
+                                        <span class="option-price">+₹{{ "%.2f"|format(size.price) }}</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3>Step 3: Choose Frosting</h3>
+                            <div class="cake-options">
+                                {% for frosting in frostings %}
+                                <div class="form-check cake-option">
+                                    <input class="form-check-input" type="radio" name="frosting" id="frosting-{{ frosting.id }}" value="{{ frosting.id }}" 
+                                        {% if loop.first %}checked{% endif %}
+                                        data-price="{{ frosting.price }}" data-name="{{ frosting.name }}">
+                                    <label class="form-check-label" for="frosting-{{ frosting.id }}">
+                                        {{ frosting.name }} 
+                                        {% if frosting.price > 0 %}
+                                        <span class="option-price">+₹{{ "%.2f"|format(frosting.price) }}</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3>Step 4: Choose Topping</h3>
+                            <div class="cake-options">
+                                {% for topping in toppings %}
+                                <div class="form-check cake-option">
+                                    <input class="form-check-input" type="radio" name="topping" id="topping-{{ topping.id }}" value="{{ topping.id }}" 
+                                        {% if loop.first %}checked{% endif %}
+                                        data-price="{{ topping.price }}" data-name="{{ topping.name }}">
+                                    <label class="form-check-label" for="topping-{{ topping.id }}">
+                                        {{ topping.name }} 
+                                        {% if topping.price > 0 %}
+                                        <span class="option-price">+₹{{ "%.2f"|format(topping.price) }}</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3>Step 5: Special Message (Optional)</h3>
+                            <div class="form-group">
+                                {{ form.message(class="form-control", placeholder="Happy Birthday, etc.", maxlength="100") }}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h3>Step 6: Quantity</h3>
+                            <div class="quantity-control-large">
+                                <button type="button" id="decrease-quantity" class="quantity-btn minus">-</button>
+                                <span id="quantity-display" class="quantity-input">1</span>
+                                <button type="button" id="increase-quantity" class="quantity-btn plus">+</button>
+                            </div>
+                            {{ form.quantity(type="hidden", id="quantity-hidden", value="1") }}
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            {{ form.submit(class="btn btn-primary btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Cake customization script
+    document.addEventListener('DOMContentLoaded', function() {
+        // Price calculation variables
+        let basePrice = 20.00;
+        let sizePrice = 0.00;
+        let frostingPrice = 0.00;
+        let toppingPrice = 0.00;
+        
+        // Initialize with first options selected
+        updateFlavor(document.querySelector('input[name="flavor"]:checked'));
+        updateSize(document.querySelector('input[name="size"]:checked'));
+        updateFrosting(document.querySelector('input[name="frosting"]:checked'));
+        updateTopping(document.querySelector('input[name="topping"]:checked'));
+        updateMessage(document.getElementById('message'));
+        
+        // Flavor change handler
+        document.querySelectorAll('input[name="flavor"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateFlavor(this);
+                calculateTotal();
+            });
+        });
+        
+        // Size change handler
+        document.querySelectorAll('input[name="size"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateSize(this);
+                calculateTotal();
+            });
+        });
+        
+        // Frosting change handler
+        document.querySelectorAll('input[name="frosting"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateFrosting(this);
+                calculateTotal();
+            });
+        });
+        
+        // Topping change handler
+        document.querySelectorAll('input[name="topping"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateTopping(this);
+                calculateTotal();
+            });
+        });
+        
+        // Message change handler
+        document.getElementById('message').addEventListener('input', function() {
+            updateMessage(this);
+        });
+        
+        // Quantity control
+        const decreaseBtn = document.getElementById('decrease-quantity');
+        const increaseBtn = document.getElementById('increase-quantity');
+        const quantityDisplay = document.getElementById('quantity-display');
+        const quantityHidden = document.getElementById('quantity-hidden');
+        
+        let quantity = 1;
+        
+        function updateQuantity(newValue) {
+            if (newValue >= 1 && newValue <= 10) {
+                quantity = newValue;
+                quantityDisplay.textContent = quantity;
+                quantityHidden.value = quantity;
+            }
+        }
+        
+        decreaseBtn.addEventListener('click', function() {
+            updateQuantity(quantity - 1);
+        });
+        
+        increaseBtn.addEventListener('click', function() {
+            updateQuantity(quantity + 1);
+        });
+        
+        // Update cake layer based on flavor selection
+        function updateFlavor(flavorRadio) {
+            const cakeBottom = document.getElementById('cake-bottom');
+            const cakeTop = document.getElementById('cake-top');
+            
+            basePrice = parseFloat(flavorRadio.dataset.price);
+            document.getElementById('flavor-name').textContent = flavorRadio.dataset.name;
+            document.getElementById('base-price').textContent = basePrice.toFixed(2);
+            
+            // Update cake color based on flavor
+            let cakeColor;
+            switch (flavorRadio.value) {
+                case 'vanilla':
+                    cakeColor = '#f8e8c4';
+                    break;
+                case 'chocolate':
+                    cakeColor = '#5c3a21';
+                    break;
+                case 'strawberry':
+                    cakeColor = '#ffcdd2';
+                    break;
+                case 'red-velvet':
+                    cakeColor = '#b71c1c';
+                    break;
+                default:
+                    cakeColor = '#f8e8c4';
+            }
+            
+            cakeBottom.setAttribute('fill', cakeColor);
+            cakeTop.setAttribute('fill', cakeColor);
+        }
+        
+        // Update cake size
+        function updateSize(sizeRadio) {
+            const cakeLayers = document.getElementById('cake-layers');
+            
+            sizePrice = parseFloat(sizeRadio.dataset.price);
+            document.getElementById('size-name').textContent = sizeRadio.dataset.name;
+            document.getElementById('size-price').textContent = sizePrice.toFixed(2);
+            
+            // Update cake dimensions based on size
+            let scale;
+            switch (sizeRadio.value) {
+                case 'small':
+                    scale = 1.0;
+                    break;
+                case 'medium':
+                    scale = 1.2;
+                    break;
+                case 'large':
+                    scale = 1.4;
+                    break;
+                default:
+                    scale = 1.0;
+            }
+            
+            cakeLayers.setAttribute('transform', `scale(${scale}) translate(${(1-scale)*200}, ${(1-scale)*250})`);
+        }
+        
+        // Update frosting
+        function updateFrosting(frostingRadio) {
+            const cakeFrosting = document.getElementById('cake-frosting');
+            
+            frostingPrice = parseFloat(frostingRadio.dataset.price);
+            document.getElementById('frosting-name').textContent = frostingRadio.dataset.name;
+            document.getElementById('frosting-price').textContent = frostingPrice.toFixed(2);
+            
+            // Update frosting color
+            let frostingColor;
+            switch (frostingRadio.value) {
+                case 'buttercream':
+                    frostingColor = '#fff9e6';
+                    break;
+                case 'cream-cheese':
+                    frostingColor = '#f5f5f5';
+                    break;
+                case 'fondant':
+                    frostingColor = '#ffecb3';
+                    break;
+                default:
+                    frostingColor = '#fff9e6';
+            }
+            
+            cakeFrosting.setAttribute('fill', frostingColor);
+        }
+        
+        // Update topping
+        function updateTopping(toppingRadio) {
+            const toppingContainer = document.getElementById('cake-topping');
+            
+            toppingPrice = parseFloat(toppingRadio.dataset.price);
+            document.getElementById('topping-name').textContent = toppingRadio.dataset.name;
+            document.getElementById('topping-price').textContent = toppingPrice.toFixed(2);
+            
+            // Clear previous toppings
+            while (toppingContainer.firstChild) {
+                toppingContainer.removeChild(toppingContainer.firstChild);
+            }
+            
+            // Add selected topping
+            switch (toppingRadio.value) {
+                case 'sprinkles':
+                    for (let i = 0; i < 30; i++) {
+                        const sprinkle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        sprinkle.setAttribute('cx', 140 + Math.random() * 120);
+                        sprinkle.setAttribute('cy', 190 + Math.random() * 20);
+                        sprinkle.setAttribute('r', 2 + Math.random() * 2);
+                        sprinkle.setAttribute('fill', ['#ff6b6b', '#48dbfb', '#1dd1a1', '#feca57', '#ff9ff3'][Math.floor(Math.random() * 5)]);
+                        toppingContainer.appendChild(sprinkle);
+                    }
+                    break;
+                case 'fruit':
+                    const fruits = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f'];
+                    for (let i = 0; i < 8; i++) {
+                        const fruit = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        fruit.setAttribute('cx', 160 + (i * 10) + Math.random() * 10);
+                        fruit.setAttribute('cy', 185 + Math.random() * 10);
+                        fruit.setAttribute('r', 5 + Math.random() * 3);
+                        fruit.setAttribute('fill', fruits[Math.floor(Math.random() * fruits.length)]);
+                        toppingContainer.appendChild(fruit);
+                    }
+                    break;
+                case 'chocolate-chips':
+                    for (let i = 0; i < 15; i++) {
+                        const chip = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                        chip.setAttribute('cx', 160 + Math.random() * 80);
+                        chip.setAttribute('cy', 185 + Math.random() * 15);
+                        chip.setAttribute('r', 3 + Math.random() * 2);
+                        chip.setAttribute('fill', '#3d240b');
+                        toppingContainer.appendChild(chip);
+                    }
+                    break;
+                case 'nuts':
+                    for (let i = 0; i < 12; i++) {
+                        const nut = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+                        nut.setAttribute('cx', 160 + Math.random() * 80);
+                        nut.setAttribute('cy', 185 + Math.random() * 15);
+                        nut.setAttribute('rx', 4 + Math.random() * 2);
+                        nut.setAttribute('ry', 2 + Math.random() * 1);
+                        nut.setAttribute('fill', '#c68642');
+                        nut.setAttribute('transform', `rotate(${Math.random() * 360} ${parseFloat(nut.getAttribute('cx'))} ${parseFloat(nut.getAttribute('cy'))})`);
+                        toppingContainer.appendChild(nut);
+                    }
+                    break;
+                case 'none':
+                default:
+                    // No topping
+                    break;
+            }
+        }
+        
+        // Update message
+        function updateMessage(messageInput) {
+            const messageElement = document.getElementById('cake-message');
+            messageElement.textContent = messageInput.value.substring(0, 20);
+        }
+        
+        // Calculate total price
+        function calculateTotal() {
+            const total = basePrice + sizePrice + frostingPrice + toppingPrice;
+            document.getElementById('total-price').textContent = total.toFixed(2);
+        }
+        
+        // Initial calculation
+        calculateTotal();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmation - GustoGo{% endblock %}
+
+{% block content %}
+<section class="confirmation-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="confirmation-container">
+                    <div class="confirmation-header text-center">
+                        <div class="confirmation-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h1>Thank You for Your Order!</h1>
+                        <p>Your order has been successfully placed and confirmed.</p>
+                    </div>
+                    
+                    <div class="order-details">
+                        <div class="order-info">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Order Information</h4>
+                                    <p><strong>Order Number:</strong> #{{ order.id }}</p>
+                                    <p><strong>Order Date:</strong> {{ order.created_at.strftime('%B %d, %Y - %I:%M %p') }}</p>
+                                    <p><strong>Payment Status:</strong> 
+                                        <span class="badge {% if order.status == 'paid' %}bg-success{% else %}bg-warning{% endif %}">
+                                            {{ order.status.capitalize() }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h4>Delivery Information</h4>
+                                    <p><strong>Name:</strong> {{ current_user.first_name or current_user.username }} {{ current_user.last_name or '' }}</p>
+                                    <p><strong>Address:</strong> {{ order.shipping_address }}</p>
+                                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-items mt-4">
+                            <h4>Order Items</h4>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th class="text-end">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in order_items %}
+                                        <tr>
+                                            <td>
+                                                {{ item.item_name }}
+                                                {% if item.item_type == 'cake' and item.item_details %}
+                                                <div class="small text-muted">
+                                                    {% set details = item.item_details|tojson|safe|replace('"{', '{')|replace('}"', '}')|replace('\\"', '"') %}
+                                                    {% set details_dict = details|fromjson %}
+                                                    Size: {{ details_dict.size }} | 
+                                                    Flavor: {{ details_dict.flavor }} | 
+                                                    Frosting: {{ details_dict.frosting }} | 
+                                                    Topping: {{ details_dict.topping }}
+                                                </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>₹{{ "%.2f"|format(item.price) }}</td>
+                                            <td>{{ item.quantity }}</td>
+                                            <td class="text-end">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                            <td class="text-end">₹{{ "%.2f"|format(order.total_amount - 40.00 - (order.total_amount * 0.18)) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end"><strong>Delivery Fee:</strong></td>
+                                            <td class="text-end">₹40.00</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end"><strong>GST (18%):</strong></td>
+                                            <td class="text-end">₹{{ "%.2f"|format(order.total_amount * 0.18) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                            <td class="text-end">₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="confirmation-footer text-center mt-4">
+                        <p>Thank you for ordering with GustoGo. We'll prepare your order with care!</p>
+                        <div class="confirmation-actions mt-4">
+                            <a href="{{ url_for('main.menu') }}" class="btn btn-outline-primary me-3">Continue Shopping</a>
+                            <a href="{{ url_for('main.profile') }}" class="btn btn-primary">View Order History</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - GustoGo{% endblock %}
+
+{% block content %}
+<section class="profile-page">
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>My Profile</h1>
+            <p>Manage your account information and view order history</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="profile-sidebar">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle fa-5x"></i>
+                        </div>
+                        <h3>{{ current_user.username }}</h3>
+                        <p>{{ current_user.email }}</p>
+                    </div>
+                    
+                    <div class="profile-nav">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#profile-info" data-bs-toggle="tab">
+                                    <i class="fas fa-user me-2"></i> Personal Information
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#order-history" data-bs-toggle="tab">
+                                    <i class="fas fa-history me-2"></i> Order History
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('main.logout') }}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="tab-content">
+                    <!-- Personal Information Tab -->
+                    <div class="tab-pane fade show active" id="profile-info">
+                        <div class="profile-form-container">
+                            <h3>Personal Information</h3>
+                            
+                            <!-- Current Information Display -->
+                            <div class="current-info mb-4">
+                                <h4>Current Information</h4>
+                                <div class="info-card p-3 bg-light rounded">
+                                    <p><strong>Name:</strong> {% if current_user.first_name or current_user.last_name %}{{ current_user.first_name or '' }} {{ current_user.last_name or '' }}{% else %}{{ current_user.username }}{% endif %}</p>
+                                    <p><strong>Email:</strong> {{ current_user.email }}</p>
+                                    <p><strong>Phone:</strong> {{ current_user.phone }}</p>
+                                    {% if current_user.address %}
+                                    <p><strong>Address:</strong> {{ current_user.address }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <h4>Update Information</h4>
+                            <form method="post" class="profile-form">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">First Name</label>
+                                        {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), placeholder="Enter first name") }}
+                                        {% for error in form.first_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Last Name</label>
+                                        {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), placeholder="Enter last name") }}
+                                        {% for error in form.last_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" value="{{ current_user.email }}" disabled>
+                                    <small class="form-text text-muted">Email cannot be changed</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), placeholder="Enter your full address", rows=3) }}
+                                    {% for error in form.address.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), placeholder="Enter phone number") }}
+                                    {% for error in form.phone.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">New Password</label>
+                                    {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="Enter new password (leave blank to keep current)") }}
+                                    {% for error in form.password.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="profile-actions mt-4">
+                                    {{ form.submit(class="btn btn-primary") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Order History Tab -->
+                    <div class="tab-pane fade" id="order-history">
+                        <div class="order-history-container">
+                            <h3>Order History</h3>
+                            
+                            {% if orders %}
+                            <div class="order-list">
+                                {% for order in orders %}
+                                <div class="order-card">
+                                    <div class="order-header">
+                                        <div class="order-info">
+                                            <h5>Order #{{ order.id }}</h5>
+                                            <p class="order-date">{{ order.created_at.strftime('%B %d, %Y - %I:%M %p') }}</p>
+                                        </div>
+                                        <div class="order-status">
+                                            <span class="badge 
+                                                {% if order.status == 'pending' %}bg-warning
+                                                {% elif order.status == 'paid' %}bg-success
+                                                {% elif order.status == 'delivered' %}bg-info
+                                                {% elif order.status == 'cancelled' %}bg-danger
+                                                {% endif %}">
+                                                {{ order.status.capitalize() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="order-body">
+                                        <div class="order-items">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Price</th>
+                                                        <th>Quantity</th>
+                                                        <th class="text-end">Subtotal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for item in order.items %}
+                                                    <tr>
+                                                        <td>
+                                                            {{ item.item_name }}
+                                                            {% if item.item_type == 'cake' and item.item_details %}
+                                                            <div class="small text-muted">
+                                                                {% set cake_details = item.item_details|fromjson %}
+                                                                Size: {{ cake_details['size']['name'] }} | 
+                                                                Flavor: {{ cake_details['flavor']['name'] }} | 
+                                                                Frosting: {{ cake_details['frosting']['name'] }} | 
+                                                                Topping: {{ cake_details['topping']['name'] }}
+                                                            </div>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>₹{{ "%.2f"|format(item.price) }}</td>
+                                                        <td>{{ item.quantity }}</td>
+                                                        <td class="text-end">₹{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                                        <td class="text-end">₹{{ "%.2f"|format(order.total_amount - 40.00 - (order.total_amount * 0.18)) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3" class="text-end"><strong>Delivery Fee:</strong></td>
+                                                        <td class="text-end">₹40.00</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3" class="text-end"><strong>GST (18%):</strong></td>
+                                                        <td class="text-end">₹{{ "%.2f"|format(order.total_amount * 0.18) }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                                        <td class="text-end">₹{{ "%.2f"|format(order.total_amount) }}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        <div class="order-delivery-info mt-3">
+                                            <h6>Delivery Information</h6>
+                                            {% set delivery_info = order.shipping_address.split('\n') %}
+                                            {% if delivery_info|length > 0 %}
+                                                <p><strong>Name:</strong> {{ delivery_info[0] }}</p>
+                                            {% endif %}
+                                            {% if delivery_info|length > 1 %}
+                                                <p><strong>Address:</strong> {{ delivery_info[1] }}</p>
+                                            {% endif %}
+                                            {% if delivery_info|length > 2 %}
+                                                <p><strong>Phone:</strong> {{ delivery_info[2].replace('Phone: ', '') }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if order.status == 'paid' %}
+                                    <div class="order-footer">
+                                        <a href="{{ url_for('main.order_confirmation', order_id=order.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state text-center py-5">
+                                <i class="fas fa-shopping-bag fa-4x mb-3"></i>
+                                <h4>No orders yet</h4>
+                                <p>You haven't placed any orders yet.</p>
+                                <a href="{{ url_for('main.menu') }}" class="btn btn-primary mt-2">Start Shopping</a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

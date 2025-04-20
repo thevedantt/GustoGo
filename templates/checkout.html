@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - GustoGo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<section class="checkout-page">
+    <div class="container">
+        <div class="page-header text-center">
+            <h1>Checkout</h1>
+            <p>Complete your order information</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="checkout-form-container">
+                    <form method="post" class="checkout-form" id="payment-form">
+                        {{ form.csrf_token }}
+                        {{ form.stripe_token }}
+                        
+                        <div class="section-title">
+                            <h3>Personal Information</h3>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), 
+                                    placeholder="Enter first name",
+                                    value=current_user.first_name or current_user.username if current_user.is_authenticated else "") }}
+                                {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), 
+                                    placeholder="Enter last name",
+                                    value=current_user.last_name or '' if current_user.is_authenticated else "") }}
+                                {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), 
+                                placeholder="Enter email address", 
+                                value=current_user.email if current_user.is_authenticated else "") }}
+                            {% for error in form.email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            {{ form.phone(class="form-control" + (" is-invalid" if form.phone.errors else ""), 
+                                placeholder="Enter phone number", 
+                                value=current_user.phone if current_user.is_authenticated else "") }}
+                            {% for error in form.phone.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        {% if current_user.is_authenticated and current_user.address %}
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="use_saved_address" name="use_saved_address" checked>
+                            <label class="form-check-label" for="use_saved_address">Use my saved address</label>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-3" id="address_container">
+                            <label for="address" class="form-label">Delivery Address</label>
+                            {{ form.address(class="form-control" + (" is-invalid" if form.address.errors else ""), 
+                                placeholder="Enter your full address", 
+                                rows=3, 
+                                value=current_user.address or '' if current_user.is_authenticated else "") }}
+                            {% for error in form.address.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="section-title mt-4">
+                            <h3>Payment Information</h3>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.payment_method(type="radio", value="card", class="form-check-input", id="card", checked=true) }}
+                                <label class="form-check-label" for="card">
+                                    Credit/Debit Card
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                {{ form.payment_method(type="radio", value="upi", class="form-check-input", id="upi") }}
+                                <label class="form-check-label" for="upi">
+                                    UPI
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                {{ form.payment_method(type="radio", value="cod", class="form-check-input", id="cod") }}
+                                <label class="form-check-label" for="cod">
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div id="card-element-container" class="mb-3" data-client-secret="{% if client_secret %}{{ client_secret.split('_secret_')[0] }}{% endif %}">
+                            <div id="payment-element"></div>
+                            <div id="payment-message" class="text-danger mt-2"></div>
+                        </div>
+                        
+                        <div id="upi-element-container" class="mb-3" style="display: none;">
+                            <div class="form-group">
+                                <label for="upi_id">UPI ID</label>
+                                {{ form.upi_id(class="form-control", placeholder="yourname@upi") }}
+                                {% for error in form.upi_id.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="section-title mt-4">
+                            <h3>Order Notes (Optional)</h3>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.notes(class="form-control", placeholder="Special instructions for delivery or food preparation", rows=3) }}
+                        </div>
+                        
+                        <div class="checkout-actions">
+                            <a href="{{ url_for('main.cart') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Cart
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submit-button">
+                                <span id="button-text">Pay Now</span>
+                                <div id="spinner" class="spinner-border spinner-border-sm d-none" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h3>Order Summary</h3>
+                    <div class="order-items">
+                        {% for item in cart_items %}
+                        <div class="order-item">
+                            {% if item.item_type == 'menu' and item.menu_item %}
+                            <div class="order-item-details">
+                                <h5>{{ item.menu_item.name }}</h5>
+                                <span class="order-item-quantity">x{{ item.quantity }}</span>
+                            </div>
+                            <div class="order-item-price">₹{{ "%.2f"|format(item.calculate_price()) }}</div>
+                            {% elif item.item_type == 'cake' %}
+                            {% set cake_details = item.get_cake_details() %}
+                            <div class="order-item-details">
+                                <h5>{{ cake_details.name }}</h5>
+                                <span class="order-item-quantity">x{{ item.quantity }}</span>
+                                <div class="cake-details">
+                                    <small>{{ cake_details.size }} | {{ cake_details.flavor }} | {{ cake_details.frosting }}</small>
+                                </div>
+                            </div>
+                            <div class="order-item-price">₹{{ "%.2f"|format(item.calculate_price()) }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="order-summary-content">
+                        <div class="summary-item">
+                            <span>Subtotal:</span>
+                            <span>₹{{ "%.2f"|format(subtotal) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Delivery Fee:</span>
+                            <span>₹{{ "%.2f"|format(delivery_fee) }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>GST (18%):</span>
+                            <span>₹{{ "%.2f"|format(gst) }}</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total:</span>
+                            <span>₹{{ "%.2f"|format(total) }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payment-info mt-4">
+                    <h5>Payment Information</h5>
+                    <p class="mb-2">We accept the following payment methods:</p>
+                    <div class="payment-methods">
+                        <i class="fab fa-cc-visa fa-2x me-2"></i>
+                        <i class="fab fa-cc-mastercard fa-2x me-2"></i>
+                        <i class="fab fa-cc-amex fa-2x me-2"></i>
+                        <i class="fab fa-cc-discover fa-2x"></i>
+                    </div>
+                    <p class="mt-3 mb-0 small">Your payment information is processed securely through Stripe.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_public_key }}');
+    let elements;
+    let paymentElement;
+    
+    {% if client_secret %}
+    elements = stripe.elements({
+        clientSecret: '{{ client_secret }}',
+    });
+    
+    paymentElement = elements.create('payment');
+    paymentElement.mount('#payment-element');
+    {% else %}
+    // Hide the payment element if no client secret is available
+    document.getElementById('card-element-container').style.display = 'none';
+    document.getElementById('upi').checked = true;
+    document.getElementById('upi-element-container').style.display = 'block';
+    document.getElementById('button-text').textContent = 'Place Order';
+    {% endif %}
+    
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    const spinner = document.getElementById('spinner');
+    const paymentMessage = document.getElementById('payment-message');
+    
+    // Handle payment method switching
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const cardContainer = document.getElementById('card-element-container');
+    const upiContainer = document.getElementById('upi-element-container');
+    
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', (e) => {
+            // Reset any previous error messages
+            paymentMessage.textContent = '';
+            
+            if (e.target.value === 'card') {
+                cardContainer.style.display = 'block';
+                upiContainer.style.display = 'none';
+                buttonText.textContent = 'Pay Now';
+                // Remove any validation errors from UPI field
+                const upiId = document.getElementById('upi_id');
+                if (upiId) {
+                    upiId.classList.remove('is-invalid');
+                }
+            } else if (e.target.value === 'upi') {
+                cardContainer.style.display = 'none';
+                upiContainer.style.display = 'block';
+                buttonText.textContent = 'Place Order';
+            } else {
+                cardContainer.style.display = 'none';
+                upiContainer.style.display = 'none';
+                buttonText.textContent = 'Place Order';
+            }
+        });
+    });
+    
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Reset any previous error messages
+        paymentMessage.textContent = '';
+        
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+        
+        // Validate required fields for all payment methods
+        const requiredFields = ['first_name', 'last_name', 'email', 'phone', 'address'];
+        let isValid = true;
+        
+        requiredFields.forEach(function(field) {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        // Additional validation for UPI
+        if (paymentMethod === 'upi') {
+            const upiId = document.getElementById('upi_id');
+            if (upiId && !upiId.value.trim()) {
+                upiId.classList.add('is-invalid');
+                isValid = false;
+                paymentMessage.textContent = 'Please enter your UPI ID.';
+                return;
+            } else if (upiId) {
+                upiId.classList.remove('is-invalid');
+            }
+        }
+        
+        if (!isValid) {
+            paymentMessage.textContent = 'Please fill in all required fields.';
+            return;
+        }
+        
+        // Show loading state
+        submitButton.disabled = true;
+        buttonText.textContent = 'Processing...';
+        spinner.classList.remove('d-none');
+        
+        if (paymentMethod === 'card' && elements) {
+            try {
+                const { error } = await stripe.confirmPayment({
+                    elements,
+                    confirmParams: {
+                        return_url: window.location.origin + '/order-confirmation/0?payment_intent=' + '{{ client_secret.split("_secret_")[0] }}',
+                    },
+                });
+                
+                if (error) {
+                    paymentMessage.textContent = error.message;
+                    submitButton.disabled = false;
+                    buttonText.textContent = 'Pay Now';
+                    spinner.classList.add('d-none');
+                }
+                // Note: If successful, the user will be redirected to the return_url
+            } catch (err) {
+                paymentMessage.textContent = 'An error occurred. Please try again.';
+                submitButton.disabled = false;
+                buttonText.textContent = 'Pay Now';
+                spinner.classList.add('d-none');
+            }
+        } else {
+            // For UPI and COD, submit the form directly
+            form.submit();
+        }
+    });
+    
+    // Handle real-time validation errors for card payments
+    if (paymentElement) {
+        paymentElement.on('change', (event) => {
+            if (event.error) {
+                paymentMessage.textContent = event.error.message;
+            } else {
+                paymentMessage.textContent = '';
+            }
+        });
+    }
+
+    // Handle saved address checkbox
+    const useSavedAddressCheckbox = document.getElementById('use_saved_address');
+    const addressContainer = document.getElementById('address_container');
+    const addressField = document.getElementById('address');
+    
+    if (useSavedAddressCheckbox) {
+        useSavedAddressCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                addressField.value = '{{ current_user.address or "" }}';
+            } else {
+                addressField.value = '';
+            }
+        });
+    }
+</script>
+{% endblock %}
