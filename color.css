@@ -1,0 +1,25 @@
+color-1 {
+  color: #1c2b4a;
+}
+.color-2 {
+  color: #3d5a99;
+}
+.color-3 {
+  color: #6da1d9;
+}
+.color-4 {
+  color: #e8c468;
+}
+.color-5 {
+  color: #f4603e;
+}
+
+/* CSS Variables */
+:root {
+  --color-1: #1c2b4a;
+  --color-2: #3d5a99;
+  --color-3: #6da1d9;
+  --color-4: #e8c468;
+  --color-5: #f4603e;
+}
+ ]
